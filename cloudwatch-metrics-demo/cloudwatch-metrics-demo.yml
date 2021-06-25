@@ -45,15 +45,9 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       FunctionName: !Ref LambdaName
-      Environment:
-        Variables:
-          #need bucketName
-          soucreBucket: !Ref 'OriginalBucket'
-          targetBucket: !Ref 'TargetBucket'
       Role: !GetAtt 'LambdaRole.Arn'
       Timeout: 300
-      Runtime: nodejs12.x
-      Handler: index.handler
+      PackageType: Image
       Code:
         ImageUri: !Ref LambdaImage
   ScheduledRule:
