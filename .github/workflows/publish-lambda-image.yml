@@ -29,10 +29,12 @@ jobs:
         ECR_REPOSITORY: my-ecr-repo
         IMAGE_TAG: ${{ github.sha }}
       run: |
+        pwd
+        ls -a
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "::set-output name=lambdaImage::${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
-      working-directory: cloudwatch-metrics-demo
+      #working-directory: cloudwatch-metrics-demo
 
     - name: Deploy to AWS CloudFormation
       uses: aws-actions/aws-cloudformation-github-deploy@v1
