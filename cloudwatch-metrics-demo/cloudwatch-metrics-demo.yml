@@ -1,0 +1,89 @@
+Description:  cloudwatch demo 1 in README
+Parameters:
+  LambdaName:
+    Description: lambda default name
+    Type: String
+    Default: push-custom-metrics-lambda
+  LambdaImage:
+    Description: lambda image in ECR
+    Type: String
+Resources:
+  CloudWatchLambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join ['', ['/aws/lambda/', !Ref LambdaName ] ]
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: AWSLambdaBasicExecutionRole
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !GetAtt 'CloudWatchLambdaLogGroup.Arn'
+        - PolicyName: AWSLambdaBasicObjectPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cloudwatch:PutMetricData
+                Resource: *
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Ref LambdaName
+      Environment:
+        Variables:
+          #need bucketName
+          soucreBucket: !Ref 'OriginalBucket'
+          targetBucket: !Ref 'TargetBucket'
+      Role: !GetAtt 'LambdaRole.Arn'
+      Timeout: 300
+      Runtime: nodejs12.x
+      Handler: index.handler
+      Code:
+        ImageUri: !Ref LambdaImage
+  ScheduledRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: 'ScheduledRule to trigger lambda regularly for lambda learn session'
+      ScheduleExpression: 'rate(2 hours)'
+      State: 'ENABLED'
+      Targets:
+        - Arn:  !GetAtt 'LambdaFunction.Arn'
+          Id: !Join ['-', [!Ref LambdaName,  'event-rule'] ]
+  PermissionForEventsToInvokeLambda:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref LambdaFunction
+      Action: 'lambda:InvokeFunction'
+      Principal: 'events.amazonaws.com'
+      SourceArn: !GetAtt 'ScheduledRule.Arn'
+  LambdaErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: 'Alarm if lambda errors occur'
+      Namespace: AWS/Lambda
+      MetricName: Errors
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref LambdaFunction
+      Statistic: Sum
+      ComparisonOperator: GreaterThanThreshold
+      Threshold: 0
+      EvaluationPeriods: 1
+      Period: 60
+      TreatMissingData: breaching
