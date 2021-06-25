@@ -24,16 +24,15 @@ jobs:
 
     - name: Build, tag, and push image to Amazon ECR
       id: push-ecr
-      working-directory: ./cloudwatch-metrics-demo
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: my-ecr-repo
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        ls -a
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "::set-output name=lambdaImage::${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
+      working-directory: ./cloudwatch-metrics-demo
 
     - name: Deploy to AWS CloudFormation
       uses: aws-actions/aws-cloudformation-github-deploy@v1
