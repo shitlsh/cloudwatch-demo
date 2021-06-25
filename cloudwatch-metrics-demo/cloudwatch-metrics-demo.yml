@@ -40,7 +40,7 @@ Resources:
               - Effect: Allow
                 Action:
                   - cloudwatch:PutMetricData
-                Resource: *
+                Resource: "*"
   LambdaFunction:
     Type: AWS::Lambda::Function
     Properties:
