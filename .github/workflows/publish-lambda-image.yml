@@ -42,4 +42,4 @@ jobs:
       with:
         name: cloudwatch-metrics-demo
         template: cloudwatch-metrics-demo/cloudwatch-metrics-demo.yml
-        parameter-overrides: "LambdaImage=${{ steps.push-ecr.outputs.lambdaImage }}"
+        parameter-overrides: "LambdaImage=${{ steps.push-ecr.outputs.lambdaImage }},MyEmailAddress=${{ secrets.MY_EMAIL_ADDRESS }}"

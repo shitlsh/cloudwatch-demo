@@ -7,6 +7,9 @@ Parameters:
   LambdaImage:
     Description: lambda image in ECR
     Type: String
+  MyEmailAddress:
+    Description: replaceme@example.com
+      Type: String
 Resources:
   CloudWatchLambdaLogGroup:
     Type: AWS::Logs::LogGroup
@@ -54,7 +57,7 @@ Resources:
     Type: AWS::Events::Rule
     Properties:
       Description: 'ScheduledRule to trigger lambda regularly for lambda learn session'
-      ScheduleExpression: 'rate(2 hours)'
+      ScheduleExpression: 'rate(1 minute)'
       State: 'ENABLED'
       Targets:
         - Arn:  !GetAtt 'LambdaFunction.Arn'
@@ -81,3 +84,26 @@ Resources:
       EvaluationPeriods: 1
       Period: 60
       TreatMissingData: breaching
+  HighCpuRateAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: 'Alarm if metric CpuRate is too high'
+      Namespace: SimCpuMonitor
+      MetricName: CPURate
+      Dimensions:
+        - Name: HOST_NAME
+          Value: TailongdeMac
+      ComparisonOperator: GreaterThanThreshold
+      Statistic: Average
+      Period: 60
+      Threshold: 85
+      EvaluationPeriods: 1
+      AlarmActions:
+        - !GetAtt 'HighCpuRateAlarmSNS.Arn'
+  HighCpuRateAlarmSNS:
+    Type: AWS::SNS::Topic
+    Properties:
+      Subscription:
+        - Endpoint: !Ref MyEmailAddress
+          Protocol: "email"
+
