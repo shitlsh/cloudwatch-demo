@@ -95,7 +95,7 @@ Resources:
           Value: TailongdeMac
       ComparisonOperator: GreaterThanThreshold
       Statistic: Average
-      Period: 60
+      Period: 600 # 10分钟的平均值
       Threshold: 85
       EvaluationPeriods: 1
       AlarmActions:
