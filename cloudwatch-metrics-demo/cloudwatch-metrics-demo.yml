@@ -99,7 +99,7 @@ Resources:
       Threshold: 85
       EvaluationPeriods: 1
       AlarmActions:
-        - !GetAtt 'HighCpuRateAlarmSNS.Arn'
+        - !Ref HighCpuRateAlarmSNS
   HighCpuRateAlarmSNS:
     Type: AWS::SNS::Topic
     Properties:
