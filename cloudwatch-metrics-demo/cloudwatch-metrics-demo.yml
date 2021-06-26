@@ -9,7 +9,7 @@ Parameters:
     Type: String
   MyEmailAddress:
     Description: replaceme@example.com
-      Type: String
+    Type: String
 Resources:
   CloudWatchLambdaLogGroup:
     Type: AWS::Logs::LogGroup
