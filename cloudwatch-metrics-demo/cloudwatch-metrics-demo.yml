@@ -96,7 +96,7 @@ Resources:
       ComparisonOperator: GreaterThanThreshold
       Statistic: Average
       Period: 600 # 10分钟的平均值
-      Threshold: 75
+      Threshold: 85
       EvaluationPeriods: 1
       AlarmActions:
         - !Ref HighCpuRateAlarmSNS
