@@ -32,6 +32,8 @@ jobs:
         ECR_REPOSITORY: my-ecr-repo
         IMAGE_TAG: ${{ github.sha }}
       run: |
+        aws ecr describe-repositories --repository-names $ECR_REPOSITORY > /dev/null 2>&1 || \
+              aws ecr create-repository --repository-name $ECR_REPOSITORY
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "::set-output name=lambdaImage::${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
