@@ -1,5 +1,6 @@
 import random
 import boto3
+import json
 
 
 def handler(event, context):
@@ -32,3 +33,8 @@ def handler(event, context):
         ]
     )
     print(response)
+
+    sampleTemperatureList = [20, 22, 24, 26, 28]
+    randomTemperature = random.choices(sampleTemperatureList, weights=(30, 20, 15, 10, 5))[0] + random.randint(0, 5)
+    data = {'eventType': 'TemperatureRead', 'value': randomTemperature, 'unit': 'Centigrade'}
+    print(json.dumps(data))
