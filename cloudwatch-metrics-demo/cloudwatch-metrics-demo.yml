@@ -106,4 +106,35 @@ Resources:
       Subscription:
         - Endpoint: !Ref MyEmailAddress
           Protocol: "email"
-
+  HighTempuratureLogFilter:
+    Type: AWS::Logs::MetricFilter
+    Properties:
+      FilterPattern: { $.eventType = "TemperatureRead" }
+      LogGroupName: !Ref CloudWatchLambdaLogGroup
+      MetricTransformations:
+        -
+          MetricValue: $value
+          MetricNamespace: "SimCpuMonitor"
+          MetricName: "SimTemperature"
+  HighTempuratureAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: 'Alarm if metric CpuRate is too high'
+      Namespace: SimCpuMonitor
+      MetricName: SimTemperature
+#      Dimensions:
+#        - Name: HOST_NAME
+#          Value: TailongdeMac
+      ComparisonOperator: GreaterThanThreshold
+      Statistic: Average
+      Period: 600 # 10分钟的平均值
+      Threshold: 30
+      EvaluationPeriods: 1
+      AlarmActions:
+        - !Ref HighTempuratureAlarmSNS
+  HighTempuratureAlarmSNS:
+    Type: AWS::SNS::Topic
+    Properties:
+      Subscription:
+        - Endpoint: !Ref MyEmailAddress
+          Protocol: "email"
