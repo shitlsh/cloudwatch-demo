@@ -116,15 +116,18 @@ Resources:
           MetricValue: "$.value"  # JSON-based filter pattern - dollar ($)
           MetricNamespace: "SimCpuMonitor"
           MetricName: "SimTemperature"
+          Dimensions:
+            - Name: HOST_NAME
+              Value: TailongdeMac
   HighTempuratureAlarm:
     Type: AWS::CloudWatch::Alarm
     Properties:
       AlarmDescription: 'Alarm if metric SimTemperature is too high'
       Namespace: SimCpuMonitor
       MetricName: SimTemperature
-#      Dimensions:
-#        - Name: HOST_NAME
-#          Value: TailongdeMac
+      Dimensions:
+        - Name: HOST_NAME
+          Value: TailongdeMac
       ComparisonOperator: GreaterThanThreshold
       Statistic: Average
       Period: 600 # 10分钟的平均值
