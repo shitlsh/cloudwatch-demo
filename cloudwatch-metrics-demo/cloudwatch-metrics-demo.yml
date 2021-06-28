@@ -111,6 +111,9 @@ Resources:
     Properties:
       FilterPattern: "{ $.eventType = \"TemperatureRead\" }"
       LogGroupName: !Ref CloudWatchLambdaLogGroup
+      Dimensions:
+        - Name: Event_Type
+          Value: TemperatureRead
       MetricTransformations:
         -
           MetricValue: "$.value"  # JSON-based filter pattern - dollar ($)
@@ -122,9 +125,9 @@ Resources:
       AlarmDescription: 'Alarm if metric SimTemperature is too high'
       Namespace: SimCpuMonitor
       MetricName: SimTemperature
-#      Dimensions:
-#        - Name: HOST_NAME
-#          Value: TailongdeMac
+      Dimensions:
+        - Name: Event_Type
+          Value: TemperatureRead
       ComparisonOperator: GreaterThanThreshold
       Statistic: Average
       Period: 600 # 10分钟的平均值
